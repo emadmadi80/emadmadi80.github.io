@@ -8,8 +8,25 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./masroof-icon-192.png" />
     <title>مصروفي — Masroof</title>
-    <script type="module" crossorigin src="/Masroof/assets/index.standalone-Bg_tGQmq.js"></script>
-    <link rel="stylesheet" crossorigin href="/Masroof/assets/index-DeEm150s.css">
+    <script>
+      (function () {
+        // Works both at the site root (user.github.io) and under /Masroof/ (project page).
+        var base = /^\/Masroof(\/|$)/.test(location.pathname) ? "/Masroof/" : "/";
+        window.__MASROOF_BASE__ = base;
+        var css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = base + "assets/index-DeEm150s.css";
+        document.head.appendChild(css);
+        var v = document.createElement("script");
+        v.src = base + "whisper-voice.js";
+        v.async = false;
+        document.head.appendChild(v);
+        var m = document.createElement("script");
+        m.type = "module";
+        m.src = base + "assets/index.standalone-w1.js";
+        document.head.appendChild(m);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
