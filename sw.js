@@ -1,19 +1,14 @@
-const CACHE_NAME = "masroof-pwa-v3-whisper";
-const CDN_CACHE = "masroof-cdn-whisper-v1"; // Transformers.js + ONNX wasm from jsdelivr; kept across app updates
+const CACHE_NAME = "masroof-pwa-v4-luxury";
 const BASE_PATH = new URL("./", self.location.href).pathname;
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled([cache.add(BASE_PATH), cache.add(BASE_PATH + "whisper-voice.js"), cache.add(BASE_PATH + "whisper-worker.js")])
-    )
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add(BASE_PATH)));
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME && key !== CDN_CACHE).map((key) => caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME && key !== CACHE_NAME + "-fonts").map((key) => caches.delete(key))))
   );
   self.clients.claim();
 });
@@ -21,24 +16,17 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
-
-  // Whisper runtime (library + wasm) from jsdelivr: cache-first so it works offline after the first run.
-  if (request.method === "GET" && url.hostname === "cdn.jsdelivr.net") {
+  if (request.method === "GET" && (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com")) {
     event.respondWith(
-      caches.open(CDN_CACHE).then((cache) =>
-        cache.match(request).then(
-          (cached) =>
-            cached ||
-            fetch(request).then((response) => {
-              if (response.status === 200) void cache.put(request, response.clone());
-              return response;
-            })
-        )
+      caches.open(CACHE_NAME + "-fonts").then((cache) =>
+        cache.match(request).then((cached) => {
+          const network = fetch(request).then((r) => { void cache.put(request, r.clone()); return r; }).catch(() => cached);
+          return cached || network;
+        })
       )
     );
     return;
   }
-
   if (request.method !== "GET" || url.origin !== self.location.origin || !url.pathname.startsWith(BASE_PATH)) return;
 
   if (request.mode === "navigate") {

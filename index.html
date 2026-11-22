@@ -3,31 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <meta name="theme-color" content="#16324f" />
+    <meta name="theme-color" content="#0d2036" />
     <meta name="description" content="Masroof — bilingual daily expense tracker" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./masroof-icon-192.png" />
     <title>مصروفي — Masroof</title>
-    <script>
-      (function () {
-        // Works both at the site root (user.github.io) and under /Masroof/ (project page).
-        var base = /^\/Masroof(\/|$)/.test(location.pathname) ? "/Masroof/" : "/";
-        window.__MASROOF_BASE__ = base;
-        var css = document.createElement("link");
-        css.rel = "stylesheet";
-        css.href = base + "assets/index-DeEm150s.css";
-        document.head.appendChild(css);
-        var v = document.createElement("script");
-        v.src = base + "whisper-voice.js";
-        v.async = false;
-        document.head.appendChild(v);
-        var m = document.createElement("script");
-        m.type = "module";
-        m.src = base + "assets/index.standalone-w1.js";
-        document.head.appendChild(m);
-      })();
-    </script>
-  </head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" />
+    <script type="module" crossorigin src="/assets/index.standalone-DKnZgvMP.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DyFaBKJm.css">
+    <link rel="stylesheet" href="/assets/luxury.c0356de8.css">
+    </head>
   <body>
     <div id="root"></div>
   </body>
