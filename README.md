@@ -26,3 +26,10 @@
 - `assets/luxury.*.css` is loaded after the original stylesheet (see index.html). Delete that `<link>` line to roll back.
 - Fonts: IBM Plex Sans Arabic, Amiri, Playfair Display (Google Fonts, cached offline by sw.js).
 - Service worker cache bumped to `masroof-pwa-v4-luxury` so installed apps pick up the new look.
+
+## Recurring expenses (retroactive entries + due monitoring)
+- `assets/recurring-engine.v1.js` computes due dates (weekly / monthly / quarterly / half-yearly / yearly / custom days, month-end safe)
+  and keeps a confirmation ledger (`masroof-recurring-ledger-v1`) so a (recurring id + due date) pair can only be recorded once.
+- "Record now" lists every missed period and asks for confirmation before anything is created; entries keep their original due dates.
+- On every app open (and when the app returns after 30+ min) pending payments are shown with Confirm / Confirm all / Remind me later.
+- Nothing is added without explicit confirmation. Editing or deleting a recurring item never touches confirmed expenses.
