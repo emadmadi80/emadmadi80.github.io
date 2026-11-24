@@ -1,35 +1,26 @@
-# MASROOF PWA
+# MASROOF — GitHub Pages PWA (iPhone build, improved)
 
-هذه الحزمة هي نسخة MASROOF المستقلة للعمل على الهاتف والكمبيوتر عبر GitHub Pages.
+Static PWA: upload the contents of this folder to the repository root. Do not rename files.
 
-## النشر
+## Prepaid expenses = monthly allocations
+`assets/recurring-engine.v4.js`: a prepaid payment is NOT an expense; it creates a schedule (total / months, rounding goes to the last month).
+Due allocations (including past ones) appear on every app open and are recorded only after confirmation, on their scheduled date.
+Tapping a prepaid card opens the allocation summary + history. Editing/deleting never touches confirmed expenses.
 
-ارفع **محتويات هذا المجلد** إلى جذر مستودع `emadmadi80.github.io`، وليس المجلد نفسه. فعّل GitHub Pages من فرع `main` ومجلد `/ (root)`.
+## Voice input: two modes (chosen per device)
+First launch asks once; the More tab has a card to change it (`assets/voice-mode.v1.js`).
+- Instant speech recognition: browser recognition, starts and stops automatically (best on Android/desktop).
+- Record, then transcribe: needs `MASROOF_VOICE_API`; without it the app uses the keyboard-dictation sheet (best on iPhone).
 
-بعد النشر افتح:
+## Voice input without a server
+`assets/masroof-config.v1.js` -> `MASROOF_VOICE_API`
+- empty (default, GitHub Pages): browser speech recognition on Android/desktop, keyboard-dictation sheet on iPhone.
+- set to a speech-to-text endpoint (e.g. "/api/voice/transcribe") only on a host that provides it.
 
-`https://emadmadi80.github.io/`
+## Recurring expenses
+`assets/recurring-engine.v4.js` schedules due dates (weekly/monthly/quarterly/half-yearly/yearly/custom), keeps a
+confirmation ledger so one (recurring item + due date) is recorded once, and asks for confirmation on every app open.
+The ledger is now part of JSON backups / Drive backups and is merged on restore.
 
-يمكن تثبيت التطبيق من Chrome على Android أو الكمبيوتر عبر خيار Install App / إضافة إلى الشاشة الرئيسية. التخزين الأساسي محلي في المتصفح، وتعمل النسخة عبر HTTPS.
-
-## ملاحظات
-
-- لا تفتح `index.html` بصيغة `file://`؛ استخدم HTTPS أو localhost.
-- احتفظ بنسخة JSON احتياطية قبل استيراد بيانات قديمة.
-- إعدادات Google Drive وApps Script تُدخل من داخل التطبيق عند الحاجة.
-
-## Apps Script
-
-يوجد كود المزامنة الخلفية في `apps-script/Code.gs` إذا رغبت في نشره كمشروع Google Apps Script منفصل. لا ترفع أسرارًا أو مفاتيح خاصة إلى GitHub.
-
-## Luxury design layer
-- `assets/luxury.*.css` is loaded after the original stylesheet (see index.html). Delete that `<link>` line to roll back.
-- Fonts: IBM Plex Sans Arabic, Amiri, Playfair Display (Google Fonts, cached offline by sw.js).
-- Service worker cache bumped to `masroof-pwa-v4-luxury` so installed apps pick up the new look.
-
-## Recurring expenses (retroactive entries + due monitoring)
-- `assets/recurring-engine.v1.js` computes due dates (weekly / monthly / quarterly / half-yearly / yearly / custom days, month-end safe)
-  and keeps a confirmation ledger (`masroof-recurring-ledger-v1`) so a (recurring id + due date) pair can only be recorded once.
-- "Record now" lists every missed period and asks for confirmation before anything is created; entries keep their original due dates.
-- On every app open (and when the app returns after 30+ min) pending payments are shown with Confirm / Confirm all / Remind me later.
-- Nothing is added without explicit confirmation. Editing or deleting a recurring item never touches confirmed expenses.
+## Cache
+`sw.js` cache name is bumped on every release; assets carry `?v=` so phones pick up new files.
