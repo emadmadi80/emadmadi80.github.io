@@ -26,8 +26,8 @@
     var rect = sel.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
     var rtl = getComputedStyle(sel).direction === 'rtl';
     back = document.createElement('div'); back.className = 'sp-back';
-    back.addEventListener('pointerdown', function (e) { e.preventDefault(); close(); });
-    back.addEventListener('click', function (e) { e.preventDefault(); close(); });
+    back.addEventListener('pointerdown', function (e) { if (Date.now() - openedAt < 350) return; e.preventDefault(); close(); });
+    back.addEventListener('click', function (e) { if (Date.now() - openedAt < 350) return; e.preventDefault(); close(); });
     pop = document.createElement('div'); pop.className = 'sp-pop'; pop.setAttribute('role', 'listbox');
     pop.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     var selectedEl = null;
@@ -60,19 +60,43 @@
     document.addEventListener('keydown', onKey, true);
     window.addEventListener('resize', close);
   }
+  var openedAt = 0, tracking = null, lastTouchOpen = 0;
   function target(e) {
     var s = e.target && e.target.closest ? e.target.closest('select') : null;
     return s && !s.disabled && touchLayout() ? s : null;
   }
-  ['pointerdown', 'mousedown'].forEach(function (t) {
-    document.addEventListener(t, function (e) {
-      var s = target(e); if (!s) return;
-      e.preventDefault();
-      if (t === 'pointerdown') open(s);
-    }, true);
-  });
-  document.addEventListener('click', function (e) { var s = target(e); if (s) { e.preventDefault(); e.stopPropagation(); } }, true);
-  document.addEventListener('keydown', function (e) {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.tagName === 'SELECT' && touchLayout() && !pop) { e.preventDefault(); open(e.target); }
+  function guardedOpen(s) { openedAt = Date.now(); open(s); }
+  /* Touch: open only on a real tap (finger barely moved, short press). A scroll gesture that merely
+     starts on a select never opens it. preventDefault on touchend also cancels the native picker. */
+  document.addEventListener('touchstart', function (e) {
+    var s = target(e); tracking = null;
+    if (!s || e.touches.length !== 1) return;
+    tracking = { s: s, x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
+  }, { capture: true, passive: true });
+  document.addEventListener('touchmove', function (e) {
+    if (!tracking) return;
+    var t = e.touches[0];
+    if (Math.abs(t.clientX - tracking.x) > 10 || Math.abs(t.clientY - tracking.y) > 10) tracking = null;
+  }, { capture: true, passive: true });
+  document.addEventListener('touchend', function (e) {
+    var tr = tracking; tracking = null;
+    if (!tr || Date.now() - tr.t > 700) return;
+    if (e.cancelable) e.preventDefault();
+    lastTouchOpen = Date.now();
+    guardedOpen(tr.s);
+  }, { capture: true, passive: false });
+  document.addEventListener('touchcancel', function () { tracking = null; }, true);
+  /* Mouse / pen on a narrow window: block the native picker on mousedown, open on click. */
+  document.addEventListener('mousedown', function (e) { if (target(e) && Date.now() - lastTouchOpen > 600) e.preventDefault(); }, true);
+  document.addEventListener('click', function (e) {
+    var s = target(e); if (!s) return;
+    e.preventDefault(); e.stopPropagation();
+    if (Date.now() - lastTouchOpen > 600 && !pop) guardedOpen(s);
   }, true);
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.tagName === 'SELECT' && touchLayout() && !pop) { e.preventDefault(); guardedOpen(e.target); }
+  }, true);
+  /* A floating list must never survive page scrolling. */
+  window.addEventListener('scroll', function (e) { if (pop && !(e.target && e.target.nodeType === 1 && pop.contains(e.target))) close(); }, true);
+  window.__spOpenedAt = function () { return openedAt; };
 })();
