@@ -24,3 +24,8 @@ The ledger is now part of JSON backups / Drive backups and is merged on restore.
 
 ## Cache
 `sw.js` cache name is bumped on every release; assets carry `?v=` so phones pick up new files.
+
+## Refinements (round 3)
+- `assets/select-popover.v1.js`: compact dropdown on touch screens (half-screen size, smaller text).
+- Voice entry: shop field is focused without raising the keyboard; an Undo button steps back through voice entries until a payment method is pressed.
+- No text caret/selection on static text (inputs stay selectable).

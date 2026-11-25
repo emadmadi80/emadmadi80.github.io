@@ -1,4 +1,4 @@
-const CACHE_NAME = "masroof-pwa-v34-prepaid";
+const CACHE_NAME = "masroof-pwa-v35-refinements";
 const BASE_PATH = new URL("./", self.location.href).pathname;
 
 self.addEventListener("install", (event) => {
